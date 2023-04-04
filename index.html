@@ -1,1 +1,70 @@
-"Hello World - how are you?" 
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bitcoin & Crypto Dashboard</title>
+  <style>
+
+    body {
+      font-family: Verdana;
+      padding: 20px;
+    }
+
+    .my-title {
+      font-size: 20px;
+      line-height: 1.5;
+      color: black;
+    }
+
+    .my-index {
+      font-size: 24px;
+      line-height: 1.5;
+      color: blue;
+    }
+
+    .my-credits {
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="my-title">Colin's Bitcoin Bull Run Index (CBBI)</div>
+  <div class="my-index" id="colins-btc-bullrun-index"></div>
+
+  <p class="my-credits">Data provided by <a href="https://colintalkscrypto.com/cbbi/" target="_blank">Colin Talks Crypto</a>.</p>
+
+    <script>
+      fetch('https://colintalkscrypto.com/cbbi/data/latest.json')
+        .then(response => response.json())
+        .then(data => {
+          const confidence = data.Confidence;
+          // const lastItem = confidence[confidence.length - 1];
+
+          const sortedKeys = Object.keys(confidence).sort();
+          const lastKey = sortedKeys[sortedKeys.length - 1];
+          const lastValue = confidence[lastKey];
+          document.getElementById('colins-btc-bullrun-index').textContent = `${lastValue * 100}`;
+        })
+        .catch(error => console.error(error));
+    </script>
+
+    <p></p>
+
+    <div class="my-title">Fear & Greed Index</div>
+    <div class="my-index" id="fear-n-greed-index"></div>
+
+    <img src="https://alternative.me/crypto/fear-and-greed-index.png" style="width: 400px; height: 360px;" alt="Latest Crypto Fear & Greed Index" />
+
+    <p class="my-credits">Data provided by <a href="https://alternative.me/crypto/fear-and-greed-index/#api" target="_blank">Alternative.me</a>.</p>
+
+    <script>
+      fetch('https://api.alternative.me/fng/')
+        .then(response => response.json())
+        .then(data => {
+          const fngValue = data.data[0].value;
+          document.getElementById('fear-n-greed-index').textContent = fngValue;
+        })
+        .catch(error => console.error(error));
+    </script>
+  </body>
+</html>

@@ -1,39 +1,129 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Bitcoin & Crypto Dashboard</title>
-  <style>
+    <style>
 
-    body {
-      font-family: Verdana;
-      padding: 20px;
-    }
+      body {
+        font-family: Verdana;
+        padding: 20px;
+      }
 
-    .my-title {
-      font-size: 20px;
-      line-height: 1.5;
-      color: black;
-    }
+      .my-title {
+        padding-top: 10px;
+        font-size: 22px;
+        font-weight: bold;
+        line-height: 1.5;
+        color: #e6820c;
+      }
 
-    .my-index {
-      font-size: 24px;
-      line-height: 1.5;
-      color: blue;
-    }
+      .my-index {
+        font-size: 22px;
+        line-height: 1.5;
+        color: blue;
+      }
 
-    .my-credits {
-      font-size: 12px;
-    }
-  </style>
-</head>
+      .my-credits {
+        font-size: 12px;
+      }
+    </style>
+  </head>
 
-<body>
+  <body>
     <h1>Crypto Dashboard</h1>
 
-  <div class="my-title">Colin's Bitcoin Bull Run Index (CBBI)</div>
-  <div class="my-index" id="colins-btc-bullrun-index"></div>
+    <!-- ************************
+    * LATEST BITCOIN PRICE
+    ***************************** -->
+    <div class="my-title">Latest Bitcoin Price (USD)</div>
+    <div class="my-index" id="btc-price"></div>
+    <div class="" id="last-updated"></div>
+    <p class="my-credits">Data provided by <a href="https://coinbase.com/" target="_blank">Coinbase.com</a></p>
 
-  <p class="my-credits">Data provided by <a href="https://colintalkscrypto.com/cbbi/" target="_blank">Colin Talks Crypto</a>.</p>
+    
+    <script>
+      // Make a request to the Coinbase API
+      fetch('https://api.coinbase.com/v2/prices/BTC-USD/spot')
+        .then(response => response.json())
+        .then(data => {
+          // Update the price and time on the page
+          document.getElementById('btc-price').textContent = '$' + Number(data.data.amount).toLocaleString('en-US');
+        })
+        .catch(error => {
+          console.error(error);
+        });
+
+      const now = new Date();
+      const dateString = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      const timeString = now.toLocaleTimeString('en-US');
+      document.getElementById('last-updated').textContent = `Last updated: ${dateString} at ${timeString}`;
+
+    </script>
+
+    <p></p>
+
+    <!-- ************************
+    * Bitcoin Halving Estimate
+    ***************************** -->
+
+    <div class="my-title">Bitcoin Halving Estimate</div>
+    <div class="" id="bitcoin-halving-result"></div>
+    <p></p>
+    Estimate based on blocks remaining until the next Bitcoin halving and a 10 min average block time.
+
+    <script>
+      // Call API to get current block height
+      fetch('https://blockchain.info/q/getblockcount')
+      .then(response => response.text())
+      .then(blockHeight => {
+          // Convert block height from string to number
+          blockHeight = parseInt(blockHeight);
+          console.log("blockHeight = ", blockHeight);
+
+          // Set halving interval to 210,000 blocks
+          var halvingInterval = 210000;
+
+          // Calculate blocks remaining until next halving
+          var blocksRemaining = halvingInterval - (blockHeight % halvingInterval);
+          console.log("blocksRemaining = ", blocksRemaining);
+
+          // Calculate days remaining until next halving
+          // (Blocks remaining * Approx 10 mins per block creation) 
+          // divided by # mins per hour, divided by # hours per day = days remaining.
+          var daysRemaining = ((blocksRemaining * 10) / 60) / 24; 
+          console.log("daysRemaining = ", daysRemaining);
+
+          // Calculate next halving block
+          var nextHalvingBlock = blockHeight + blocksRemaining;
+
+          // Calculate next halving date
+          var nextHalvingDate = new Date(Date.now() + daysRemaining * 24 * 60 * 60 * 1000);
+
+          // Display results
+          document.getElementById("bitcoin-halving-result").innerHTML = 
+              // "Next halving block:" + nextHalvingBlock +
+              "<br>Days remaining: " + Math.floor(daysRemaining) + "<br>Next halving date: " + nextHalvingDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        })
+        .catch(error => {
+          console.log(error);
+          document.getElementById("bitcoin-halving-result").innerHTML = "An error occurred while retrieving the current block height.";
+        });
+    </script>
+
+    <p></p>
+
+    <!-- ************************
+    * CBBI INDEX 
+    ***************************** -->
+    <div class="my-title">CBBI - Colin's Bitcoin Bull Run Index</div>
+
+    <!-- shows the CBBI, id is updated by JavaScript -->
+    <div class="my-index" id="colins-btc-bullrun-index"></div>
+
+    <p class="my-credits">Data provided by <a href="https://colintalkscrypto.com/cbbi/" target="_blank">Colin Talks Crypto</a>.</p>
 
     <script>
       fetch('https://colintalkscrypto.com/cbbi/data/latest.json')
@@ -53,23 +143,76 @@
     </script>
 
     <p></p>
-
+    
+    <!-- ************************
+    * FEAR & GREED INDEX 
+    ***************************** -->
     <div class="my-title">Fear & Greed Index</div>
+    
+    <!-- shows the Fear & Greed index, id is updated by JavaScript -->
     <div class="my-index" id="fear-n-greed-index"></div>
 
     <img src="https://alternative.me/crypto/fear-and-greed-index.png" style="width: 400px; height: 360px;" alt="Latest Crypto Fear & Greed Index" />
 
-    <p class="my-credits">Data provided by <a href="https://alternative.me/crypto/fear-and-greed-index/#api" target="_blank">Alternative.me</a>.</p>
+    <p class="my-credits">Data provided by <a href="https://alternative.me/crypto/fear-and-greed-index/#api" target="_blank">Alternative.me</a></p>
 
     <script>
+
+      let myfearNGreedLatest;
+
       fetch('https://api.alternative.me/fng/')
         .then(response => response.json())
         .then(data => {
           const fngValue = data.data[0].value;
           const classification = data.data[0].value_classification;
+          myfearNGreedLatest = fngValue;
           document.getElementById('fear-n-greed-index').textContent = fngValue + " - " + classification;
         })
         .catch(error => console.error(error));
     </script>
+
+
+    <!-- ************************
+    * Composite CBBI index + FEAR & GREED index
+    ***************************** -->
+    <div class="my-title">CBF Composite Index (CBBI + FNG)</div>
+
+    <!-- shows the composite index, id is updated by JavaScript -->
+    <div class="my-index" id="composite-index"></div>
+    80/20 weighted average. 
+    <p></p>
+    CBBI is a longer cycle index. FNG index follows shorter weekly to monthly cycles. So give more weight to the longer cycle CBBI, due to the majical power of Bitcoin halving.
+
+    <p class="my-credits">CBBI data provided by <a href="https://colintalkscrypto.com/cbbi/" target="_blank">Colin Talks Crypto</a>. FNG data provided by <a href="https://alternative.me/crypto/fear-and-greed-index/#api" target="_blank">Alternative.me</a>.</p>
+
+    <script>
+      let myCBBI;
+      let myFNG;
+
+      fetch('https://colintalkscrypto.com/cbbi/data/latest.json')
+        .then(response => response.json())
+        .then(data => {
+          const confidence = data.Confidence;
+          const sortedKeys = Object.keys(confidence).sort();
+          const lastKey = sortedKeys[sortedKeys.length - 1];
+          const lastValue = confidence[lastKey];
+          myCBBI = lastValue;
+          fetch('https://api.alternative.me/fng/')
+            .then(response => response.json())
+            .then(data => {
+              const fngValue = data.data[0].value;
+              myFNG = fngValue;
+              // 80/20 weighted average. As CBBI is in longer cycles, i.e. 4 year halvings.
+              // FNG index is shorter week to monthly cycles. So give more weight to longer cycle CBBI.
+              const compositeIndex = Math.round( (myCBBI * 0.8 * 100) + (myFNG * 0.2) );
+              console.log("myCBBI = " + myCBBI + " myFNG = ", myFNG);
+
+              document.getElementById('composite-index').textContent = `${compositeIndex}`;
+            })
+            .catch(error => console.error(error));
+        })
+        .catch(error => console.error(error));
+    </script>
+
   </body>
 </html>

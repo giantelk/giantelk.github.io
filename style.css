@@ -8,10 +8,19 @@ body {
   padding: 20px;
 }
 
+header {
+  margin: 5px;
+}
+
+footer{
+  font-size: 14px;
+  margin: 10px;
+}
+
 section {
   background-color: beige;
   padding: 12px;
-  margin: 9px;
+  margin: 12px;
   border: 2px solid lightgrey;
   border-radius: 14px;
 }
@@ -50,10 +59,7 @@ section {
 
 .my-contact{
   font-size: 16px;
-}
-
-.my-footer{
-  font-size: 14px;
+  margin: 8px
 }
 
 /* Slider for TTM composite index */
@@ -106,12 +112,19 @@ section {
   background-color: #e7e7e7;
 }
 
+
 /* styles for mobile screens */
 @media (max-width: 600px) {
   body {
-    padding: 10px;
+    padding: 0px;
     max-width: 100%;
   }
+
+  section {
+    margin: 0px 1px 12px 0px;
+    border-radius: 8px;
+  }
+
   /* Slider for TTM composite index */
   .TTM-slider{
     width: 75%;
